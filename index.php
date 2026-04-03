@@ -1,6 +1,7 @@
 <?php
 
 use Kirby\Cms\App as Kirby;
+use Kirby\Cms\App;
 use Kirby\Cms\Response;
 
 Kirby::plugin('iperstudio/sitemap-plugin', [
