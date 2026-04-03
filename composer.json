@@ -5,14 +5,10 @@
     "type": "kirby-plugin",
     "version": "1.0.2",
     "authors": [
-        {
-            "name": "Marco Mezzavilla",
-            "email": "hub@marcomezzavilla.com"
-        },
-        {
-            "name": "Giorgio Da Re",
-            "email": "hello@giorgiodare.it"
-        }
+		{
+			"name": "Iperstudio",
+			"email": "ciao@iperstudio.net"
+		}
     ],
     "require": {
         "getkirby/composer-installer": "^1.1"
