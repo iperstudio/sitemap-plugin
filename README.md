@@ -14,8 +14,18 @@ Provides:
 
 ### Composer
 
+Add to your project `composer.json` then run `composer update`.
+
 ```
-composer require iperstudio/sitemap-plugin
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "git@github.com:iperstudio/sitemap-plugin.git"
+    }
+  ],
+  "require": {
+    "iperstudio/sitemap-plugin": "^1.0"
+  },
 ```
 
 ## Setup
