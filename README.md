@@ -89,6 +89,31 @@ In multilanguage Kirby setups, the sitemap automatically adds `hreflang` alterna
 ### Stylesheet
 Visiting `/sitemap.xml` in a browser renders a human-readable styled view via the bundled `sitemap.xsl`.
 
+## Updates
+
+1. Update the code and the version number in `composer.json`:
+```
+"version": "1.0.X"
+```
+
+2. Commit and push the changes
+```
+git add .
+git commit -m "See last commit"
+git push origin main
+```
+
+3. Add the tag after the push
+```
+git tag v1.0.X
+git push origin v1.0.X
+```
+
+4. Update the plugin in the project repo
+```
+composer update iperstudio/sitemap-plugin
+```
+
 ## License
 
 MIT
