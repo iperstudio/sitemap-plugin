@@ -4,11 +4,13 @@
     "license": "MIT",
     "type": "kirby-plugin",
     "version": "1.0.2",
+    "homepage": "https://github.com/iperstudio/sitemap-plugin",
     "authors": [
-		{
-			"name": "Iperstudio",
-			"email": "ciao@iperstudio.net"
-		}
+        {
+            "name": "Iperstudio",
+            "email": "ciao@iperstudio.net",
+            "homepage": "https://iperstudio.net/"
+        }
     ],
     "require": {
         "php": ">=8.2",

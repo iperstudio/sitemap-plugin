@@ -19,7 +19,7 @@ Provides:
 
 Add to your project `composer.json` then run `composer update`.
 
-```
+```json
   "repositories": [
     {
       "type": "vcs",
@@ -92,25 +92,25 @@ Visiting `/sitemap.xml` in a browser renders a human-readable styled view via th
 ## Updates
 
 1. Update the code and the version number in `composer.json`:
-```
+```json
 "version": "1.0.X"
 ```
 
 2. Commit and push the changes
-```
+```bash
 git add .
 git commit -m "See last commit"
 git push origin main
 ```
 
 3. Add the tag after the push
-```
+```bash
 git tag v1.0.X
 git push origin v1.0.X
 ```
 
 4. Update the plugin in the project repo
-```
+```bash
 composer update iperstudio/sitemap-plugin
 ```
 
