@@ -11,6 +11,10 @@
 		}
     ],
     "require": {
+        "php": ">=8.2",
         "getkirby/composer-installer": "^1.1"
+    },
+    "conflict": {
+        "getkirby/cms": "<5.0.0 || >=6.0.0"
     }
 }

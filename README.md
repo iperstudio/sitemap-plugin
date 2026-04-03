@@ -1,5 +1,8 @@
 # Iperstudio Sitemap Plugin
 
+[![Kirby 5](https://flat.badgen.net/badge/Kirby/5)](https://getkirby.com)
+![PHP 8.2](https://flat.badgen.net/badge/PHP/8.2)
+
 Provides:
 
 - `sitemap.xml` auto-generated route
