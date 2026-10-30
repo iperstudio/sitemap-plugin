@@ -1,0 +1,82 @@
+@namespace sitemap url("http://www.sitemaps.org/schemas/sitemap/0.9");
+@namespace xhtml url("http://www.w3.org/1999/xhtml");
+
+sitemap|urlset {
+  display: block;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #fff;
+  color: #222;
+  font: 0.875rem/1.5 system-ui, sans-serif;
+  counter-reset: urls;
+}
+
+sitemap|urlset::before {
+  content: "Sitemap";
+  display: block;
+  margin-bottom: 1.5rem;
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+sitemap|url {
+  display: block;
+  position: relative;
+  padding: 1rem 0 1rem 3rem;
+  border-top: 1px solid #ddd;
+  overflow-wrap: anywhere;
+  counter-increment: urls;
+}
+
+sitemap|url::before {
+  content: counter(urls);
+  position: absolute;
+  left: 0;
+  color: #666;
+  font-variant-numeric: tabular-nums;
+}
+
+sitemap|loc {
+  display: block;
+  color: #174f9a;
+  font-weight: 600;
+}
+
+sitemap|lastmod,
+sitemap|priority,
+sitemap|changefreq {
+  display: block;
+  margin-top: 0.25rem;
+  color: #555;
+  font-size: 0.75rem;
+}
+
+sitemap|lastmod::before { content: "Last modified: "; }
+sitemap|priority::before { content: "Priority: "; }
+sitemap|changefreq::before { content: "Change frequency: "; }
+
+xhtml|link {
+  display: block;
+  margin-top: 0.25rem;
+  color: #666;
+  font-size: 0.75rem;
+}
+
+xhtml|link::before { content: attr(hreflang) " · " attr(href); }
+
+@media (width < 40rem) {
+  sitemap|urlset { padding: 1rem; }
+  sitemap|url { padding-left: 2rem; }
+}
+
+@media (prefers-color-scheme: dark) {
+  sitemap|urlset { background: #161616; color: #eee; }
+  sitemap|url { border-color: #444; }
+  sitemap|loc { color: #94bfff; }
+  sitemap|url::before,
+  sitemap|lastmod,
+  sitemap|priority,
+  sitemap|changefreq,
+  xhtml|link { color: #bbb; }
+}

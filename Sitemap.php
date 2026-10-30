@@ -44,8 +44,14 @@ final class Sitemap
     {
         $xml = new \DOMDocument('1.0', 'UTF-8');
         $xml->formatOutput = true;
-        $stylesheet = rtrim($kirby->url('index'), '/') . '/sitemap.xsl';
-        $xml->appendChild($xml->createProcessingInstruction('xml-stylesheet', 'type="text/xsl" href="' . htmlspecialchars($stylesheet, ENT_QUOTES | ENT_XML1, 'UTF-8') . '"'));
+        $style = self::option($kirby, 'stylesheet', 'css');
+        if ($style !== false) {
+            if (!in_array($style, ['css', 'xsl'], true)) {
+                throw new \InvalidArgumentException('Sitemap stylesheet must be css, xsl or false.');
+            }
+            $stylesheet = rtrim($kirby->url('index'), '/') . '/sitemap.' . $style;
+            $xml->appendChild($xml->createProcessingInstruction('xml-stylesheet', 'type="text/' . $style . '" href="' . htmlspecialchars($stylesheet, ENT_QUOTES | ENT_XML1, 'UTF-8') . '"'));
+        }
         $namespace = 'http://www.sitemaps.org/schemas/sitemap/0.9';
         $root = $xml->appendChild($xml->createElementNS($namespace, 'urlset'));
         if ($kirby->multilang()) $root->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:xhtml', 'http://www.w3.org/1999/xhtml');

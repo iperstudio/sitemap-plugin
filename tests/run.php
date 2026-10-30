@@ -41,7 +41,8 @@ foreach ($xpath->query('//s:url') as $entry) {
     check((bool)DateTimeImmutable::createFromFormat(DATE_ATOM, $modified), 'lastmod is a valid timestamp');
     if (str_contains($url, '/en/')) check(strtotime($modified) === 1700000000, 'lastmod uses the actual translation modification time');
 }
-check(str_contains($xml->saveXML(), 'https://example.test/subsite/sitemap.xsl'), 'Stylesheet URL includes the installation base path');
+check(str_contains($xml->saveXML(), 'type="text/css" href="https://example.test/subsite/sitemap.css"'), 'CSS is the default stylesheet and honors the installation base path');
+check(!str_contains($xml->saveXML(), 'text/xsl'), 'Default sitemap does not invoke browser XSLT');
 $draft = $kirby->site()->draft('draft');
 $child = new Kirby\Cms\Page(['slug' => 'child', 'parent' => $draft, 'num' => 1]);
 check(!Sitemap::includes($draft) && !Sitemap::includes($child), 'Drafts and descendants are excluded');
@@ -70,9 +71,11 @@ $kirby = fixture([], false);
 check($xpath->query('//s:loc')->length === 3 && $xpath->query('//x:link')->length === 0, 'Single-language sites have no hreflang links');
 $response = $kirby->call('sitemap.xml', 'GET');
 check($response->code() === 200 && $response->header('X-Robots-Tag') === 'noindex', 'Sitemap route returns XML with noindex for the sitemap document');
+$css = $kirby->call('sitemap.css', 'GET');
+check($css->code() === 200 && $css->type() === 'text/css' && str_contains($css->body(), '@namespace sitemap'), 'CSS route serves namespace-aware sitemap styles');
 $xsl = new DOMDocument;
-check($xsl->loadXML($kirby->call('sitemap.xsl', 'GET')->body()), 'Stylesheet route returns well-formed XSL');
-check($xsl->documentElement->getAttribute('version') === '1.0', 'Stylesheet uses browser-compatible XSLT 1.0');
+check($xsl->loadXML($kirby->call('sitemap.xsl', 'GET')->body()), 'Legacy XSL route remains available');
+check($xsl->documentElement->getAttribute('version') === '1.0', 'Legacy stylesheet remains XSLT 1.0');
 if (class_exists('XSLTProcessor')) {
     $processor = new XSLTProcessor;
     $processor->importStylesheet($xsl);
@@ -87,5 +90,21 @@ check($xpath->query('//x:link')->length > 0 && str_contains($xml->saveXML(), '/i
 $kirby = new Kirby\Cms\App(['roots' => ['index' => $kirby->root('index')], 'urls' => ['index' => 'https://example.test/sub&site'], 'options' => ['languages' => true]]);
 [$xml, $xpath] = sitemapDocument($kirby);
 check(str_contains($xml->saveXML(), 'sub&amp;site') && str_contains($xpath->query('//s:loc')->item(0)->textContent, 'sub&site'), 'URLs containing ampersands are escaped once and round-trip correctly');
+
+$content = [];
+foreach (['css', 'xsl', false] as $style) {
+    $kirby = new Kirby\Cms\App([
+        'roots' => ['index' => $kirby->root('index')],
+        'urls' => ['index' => 'https://example.test/sub&site'],
+        'options' => ['languages' => true, 'iperstudio.sitemap-plugin.stylesheet' => $style],
+    ]);
+    [$xml, $xpath] = sitemapDocument($kirby);
+    $content[] = $xml->documentElement->C14N();
+    if ($style === false) check($xpath->query('/processing-instruction("xml-stylesheet")')->length === 0, 'Stylesheet can be disabled for raw XML');
+    if ($style === 'xsl') check(str_contains($xml->saveXML(), 'type="text/xsl"'), 'Legacy XSL can be explicitly enabled');
+}
+check(count(array_unique($content)) === 1, 'CSS, legacy XSL and raw XML have identical sitemap data');
+$kirby = fixture(['iperstudio.sitemap.stylesheet' => false]);
+check(!str_contains(Sitemap::xml($kirby), '<?xml-stylesheet'), 'Stylesheet option also supports the legacy prefix');
 
 ob_end_flush();

@@ -15,6 +15,12 @@ App::plugin('iperstudio/sitemap-plugin', [
             },
         ],
         [
+            'pattern' => 'sitemap.css',
+            'action' => function () {
+                return new Response(file_get_contents(__DIR__ . '/sitemap.css'), 'text/css');
+            },
+        ],
+        [
             'pattern' => 'sitemap.xsl',
             'action' => function () {
                 return new Response(file_get_contents(__DIR__ . '/sitemap.xsl'), 'text/xsl');

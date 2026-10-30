@@ -1,6 +1,16 @@
 # Changelog
 
-## 1.1.0 — Unreleased
+## 1.2.0 — Unreleased
+
+- Replace the default browser XSLT transformation with CSS applied directly to sitemap XML.
+- Add the `/sitemap.css` route with responsive, dark-mode-aware styles.
+- Add `stylesheet: 'css' | 'xsl' | false`, including support for the legacy option prefix.
+- Retain `/sitemap.xsl` and opt-in legacy XSLT rendering for compatibility.
+- Preserve the exact sitemap data across CSS, legacy XSL and raw XML views.
+
+The CSS view displays URLs as selectable text, rather than transformed HTML hyperlinks. No content migration is needed. Browser XSLT is no longer required by default.
+
+## 1.1.0 — 2026-10-30
 
 - Preserve all `iperstudio.sitemap` options and support the registered `iperstudio.sitemap-plugin` prefix with per-option precedence.
 - Build escaped XML with DOM, use translation-specific lastmod dates and add x-default links.
