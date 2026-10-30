@@ -1,0 +1,26 @@
+name: Tests
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - php: '8.2'
+            kirby: '^5.0'
+          - php: '8.4'
+            kirby: '^5.0'
+          - php: '8.4'
+            kirby: '^6.0@beta'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, mbstring, gd, curl, intl
+          tools: composer:v2
+      - run: composer validate --no-check-publish
+      - run: composer require --dev 'getkirby/cms:${{ matrix.kirby }}' --no-interaction --prefer-dist
+      - run: composer test
