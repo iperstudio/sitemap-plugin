@@ -6,13 +6,47 @@ Requires PHP 8.2+, DOM and Kirby 5 or 6. Tested locally with Kirby 5.3.1, 5.6.1 
 
 ## Installation
 
-Install from Packagist:
+Run this command from your Kirby project's root directory:
 
 ```sh
-composer require iperstudio/sitemap-plugin:^1.2
+composer require "iperstudio/sitemap-plugin:^1.2"
 ```
 
-The Kirby Composer installer places the plugin in `site/plugins/sitemap-plugin`. No custom Composer repository is required.
+The package is available on [Packagist](https://packagist.org/packages/iperstudio/sitemap-plugin); no custom `repositories` entry or GitHub credentials are required. The Kirby Composer installer places the plugin in `site/plugins/sitemap-plugin`. Allow `getkirby/composer-installer` if Composer prompts for permission to run it.
+
+Commit `composer.json` and `composer.lock`. Keep the installed plugin directory out of version control and make changes in this plugin's source repository, rather than editing the installed files.
+
+### Switching an existing installation to Packagist
+
+If the plugin was installed with Composer through a `vcs` repository, remove only this plugin's entry from your project's `repositories` array. Keep repositories required by other dependencies, then run the update command below. Existing configuration and content can remain in place.
+
+For a manually copied installation:
+
+1. Back up any custom changes and move `site/plugins/sitemap-plugin` outside `site/plugins` so the old and new copies cannot load together.
+2. If the plugin files were tracked by Git, remove them from the index with `git rm -r --cached -- site/plugins/sitemap-plugin` and add the directory to `.gitignore`.
+3. Run the installation command above. Move project-specific behavior into the documented configuration options instead of copying changes over the installed package.
+
+## Updates
+
+Update this plugin within the version constraint in your project's `composer.json`:
+
+```sh
+composer update iperstudio/sitemap-plugin
+```
+
+Review the changelog and the `composer.lock` diff, run your project's checks, and commit the updated lock file. A `^1.0` constraint accepts compatible 1.x releases; exact versions and constraints such as `~1.0.0` may prevent the update. To explicitly adopt the current release series, use:
+
+```sh
+composer require "iperstudio/sitemap-plugin:^1.2"
+```
+
+On other environments, install the committed lock file instead of resolving new versions during deployment:
+
+```sh
+composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+```
+
+Project content is managed separately; Composer does not synchronize it.
 
 ## Configuration
 
@@ -57,11 +91,7 @@ Version 1.2 replaces the default XSLT presentation with CSS because browsers are
 
 The CSS view displays a readable list with URLs, modification dates and translated alternates, supports narrow viewports and dark mode, and works without JavaScript or XSLT. URLs are selectable text rather than the clickable HTML links produced by the old XSL transformation. The XML remains a sitemap for crawlers, not an HTML document.
 
-Set `iperstudio.sitemap-plugin.stylesheet` to `false` for the browser's raw XML view. Setting it to `'xsl'` explicitly restores the legacy presentation while a browser still supports XSLT; this also restores the browser's deprecation warning. Existing `/sitemap` and `/sitemap.xsl` routes are retained. Sites on `^1.0` or `^1.1` can update to 1.2 with the command below.
-
-```sh
-composer update iperstudio/sitemap-plugin
-```
+Set `iperstudio.sitemap-plugin.stylesheet` to `false` for the browser's raw XML view. Setting it to `'xsl'` explicitly restores the legacy presentation while a browser still supports XSLT; this also restores the browser's deprecation warning. Existing `/sitemap` and `/sitemap.xsl` routes are retained. The update workflow above applies to sites on `^1.0` and `^1.1` as well.
 
 ## Upgrading from 1.0
 
@@ -69,11 +99,7 @@ Version 1.1 is a compatible minor release. Route names, legacy configuration, th
 
 The sitemap now excludes error/noindex pages and adds x-default links. Modification timestamps use each translation's content file. These corrections can change the XML entries and should be reviewed before deployment. The new `seoNoindex` field can be supplied by the SEO plugin or your own blueprint.
 
-```sh
-composer update iperstudio/sitemap-plugin
-```
-
-A `^1.0` constraint accepts 1.1; an exact `1.0.2` or `~1.0.0` constraint must be changed to opt in. Removing legacy configuration or changing established defaults is reserved for a future major release.
+Use the update workflow above. Removing legacy configuration or changing established defaults is reserved for a future major release.
 
 ## Development and releases
 
@@ -88,7 +114,7 @@ Or test against an existing Kirby checkout:
 KIRBY_BOOTSTRAP=/absolute/path/to/kirby/bootstrap.php php tests/run.php
 ```
 
-Tests use disposable fixture sites and do not modify real content. CI covers PHP 8.2/8.4 with Kirby 5 and PHP 8.4 with Kirby 6 beta. Run `composer validate`, update the changelog and `version` together, then create the matching `v1.2.0` tag when releasing. The explicit version supports Kirby's update checks for ZIP installations; it must match the Git tag. Configure Packagist's repository webhook after submitting the public repository.
+Tests use disposable fixture sites and do not modify real content. CI covers PHP 8.2/8.4 with Kirby 5 and PHP 8.4 with Kirby 6 beta. For a new release, update the changelog and `version`, run `composer validate` and the tests, then commit and push the changes before creating and pushing the matching version tag. The explicit version supports Kirby's update checks for ZIP installations; it must match the Git tag. Packagist reads published Git tags; its GitHub webhook must be enabled to discover releases automatically. Do not move or recreate existing tags. Documentation-only changes do not require a version bump.
 
 ## License
 
