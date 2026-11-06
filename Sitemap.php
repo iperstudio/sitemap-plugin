@@ -17,7 +17,11 @@ final class Sitemap
     {
         $kirby = $page->kirby();
         if ($page->isDraft() || $page->isErrorPage()) return false;
-        foreach ($page->parents() as $parent) if ($parent->isDraft()) return false;
+        $excludeBranches = self::option($kirby, 'excludeBranches', []);
+        if (in_array($page->id(), $excludeBranches, true)) return false;
+        foreach ($page->parents() as $parent) {
+            if ($parent->isDraft() || in_array($parent->id(), $excludeBranches, true)) return false;
+        }
         if ($language !== null && $kirby->multilang() && !$page->translation($language)->exists()) return false;
         if ($page->content($language)->get('seoNoindex')->isTrue()) return false;
 
@@ -40,6 +44,21 @@ final class Sitemap
         return $page->isHomePage() ? '1.0' : number_format(max(0.1, 0.5 / $page->depth()), 1, '.', '');
     }
 
+    /**
+     * Visit published pages in index order without building a flat index.
+     * Only explicit branch exclusions can safely prune descendants.
+     *
+     * @return \Generator<Page>
+     */
+    private static function pages(iterable $pages, array $excludeBranches): \Generator
+    {
+        foreach ($pages as $page) {
+            if ($page->isDraft() || isset($excludeBranches[$page->id()])) continue;
+            yield $page;
+            yield from self::pages($page->children(), $excludeBranches);
+        }
+    }
+
     public static function xml(App $kirby): string
     {
         $xml = new \DOMDocument('1.0', 'UTF-8');
@@ -55,7 +74,8 @@ final class Sitemap
         $namespace = 'http://www.sitemaps.org/schemas/sitemap/0.9';
         $root = $xml->appendChild($xml->createElementNS($namespace, 'urlset'));
         if ($kirby->multilang()) $root->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:xhtml', 'http://www.w3.org/1999/xhtml');
-        foreach ($kirby->site()->index() as $page) {
+        $excludeBranches = array_fill_keys(self::option($kirby, 'excludeBranches', []), true);
+        foreach (self::pages($kirby->site()->children(), $excludeBranches) as $page) {
             $urls = [];
             if ($kirby->multilang()) {
                 foreach ($kirby->languages() as $language) {

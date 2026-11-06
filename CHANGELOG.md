@@ -1,6 +1,11 @@
 # Changelog
 
-## 1.2.0 — Unreleased
+## 1.3.0 — 2026-11-06
+
+- Traverse published pages progressively instead of building the full site index before filtering.
+- Add `excludeBranches` to skip configured page IDs and their entire subtrees before loading descendants.
+
+## 1.2.0 — 2026-10-30
 
 - Replace the default browser XSLT transformation with CSS applied directly to sitemap XML.
 - Add the `/sitemap.css` route with responsive, dark-mode-aware styles.

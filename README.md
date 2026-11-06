@@ -9,7 +9,7 @@ Requires PHP 8.2+, DOM and Kirby 5 or 6. Tested locally with Kirby 5.3.1, 5.6.1 
 Run this command from your Kirby project's root directory:
 
 ```sh
-composer require "iperstudio/sitemap-plugin:^1.2"
+composer require "iperstudio/sitemap-plugin:^1.3"
 ```
 
 The package is available on [Packagist](https://packagist.org/packages/iperstudio/sitemap-plugin); no custom `repositories` entry or GitHub credentials are required. The Kirby Composer installer places the plugin in `site/plugins/sitemap-plugin`. Allow `getkirby/composer-installer` if Composer prompts for permission to run it.
@@ -37,7 +37,7 @@ composer update iperstudio/sitemap-plugin
 Review the changelog and the `composer.lock` diff, run your project's checks, and commit the updated lock file. A `^1.0` constraint accepts compatible 1.x releases; exact versions and constraints such as `~1.0.0` may prevent the update. To explicitly adopt the current release series, use:
 
 ```sh
-composer require "iperstudio/sitemap-plugin:^1.2"
+composer require "iperstudio/sitemap-plugin:^1.3"
 ```
 
 On other environments, install the committed lock file instead of resolving new versions during deployment:
@@ -71,6 +71,7 @@ Flat dotted keys also work. All existing `iperstudio.sitemap` options remain sup
 | `excludeTemplates` | `[]` | Excluded intended templates when no allowlist is configured |
 | `excludeUnlisted` | `true` | Omit unlisted pages except home |
 | `includeUnlisted` | `[]` | Explicitly allow these unlisted page IDs |
+| `excludeBranches` | `[]` | Skip these page IDs and all their descendants before loading their children |
 | `pageFilter` | `null` | Callback `(Page $page, ?string $language): bool`; must return true to include a URL |
 | `filterHome` | `false` | Apply template filtering to home as well |
 | `priority` | `true` | Emit legacy automatic priority values |
@@ -84,6 +85,22 @@ The homepage still bypasses template filtering by default, as it did in 1.0. Set
 XML is built with DOM for escaping, and all route/stylesheet URLs honor installation subdirectories. CSS formats the XML directly without JavaScript or browser XSLT. The legacy `/sitemap.xsl` endpoint remains available for existing integrations. The XML response carries `X-Robots-Tag: noindex` for the sitemap document itself; this does not exclude the pages it lists.
 
 The plugin does not infer every project's access or redirect rules. Use `pageFilter` to exclude private pages, redirect-only records or other routes that do not represent public content. A sitemap contains URLs and should only list content intended to be public.
+
+### Large sites
+
+Pages are visited progressively through `children()`, without building a full `site()->index()` first. To avoid scanning entire sections that do not belong in the sitemap, configure their page IDs:
+
+```php
+'iperstudio.sitemap-plugin.excludeBranches' => ['internal', 'archive/imports'],
+```
+
+Each excluded branch root and all its descendants are omitted in every language. Its children are never loaded by the sitemap traversal. `includeUnlisted` and the homepage exception do not override branch exclusions. The same exclusions apply to `Sitemap::includes()`.
+
+Template, unlisted, noindex and `pageFilter` exclusions still affect individual pages only: an excluded parent can have eligible children. Without explicit branch exclusions, the sitemap still visits every published page; the progressive traversal avoids flat index construction, but Kirby retains loaded page objects and the XML is still assembled in memory.
+
+## Upgrading from 1.2
+
+Version 1.3 replaces full site indexing with progressive traversal and adds the optional `excludeBranches` setting described above. Existing filters and sitemap entries are preserved unless branch exclusions are configured. No content migration is required. Use the update workflow above.
 
 ## Upgrading from 1.1
 

@@ -12,7 +12,7 @@ function check(bool $condition, string $label): void
     echo "PASS: $label\n";
 }
 
-function fixture(array $options = [], bool $multilang = true): Kirby\Cms\App
+function fixture(array $options = [], bool $multilang = true, array $extraPages = []): Kirby\Cms\App
 {
     $root = sys_get_temp_dir() . '/iperstudio-plugin-test-' . bin2hex(random_bytes(6));
     foreach (['content', 'site/config', 'site/languages', 'site/plugins', 'site/templates'] as $directory) {
@@ -24,7 +24,7 @@ function fixture(array $options = [], bool $multilang = true): Kirby\Cms\App
             'code' => $code, 'default' => $default, 'name' => $code, 'locale' => 'en_US', 'url' => '/' . $code,
         ], true) . ';');
     }
-    $pages = [
+    $pages = array_replace([
         'home' => ['home', 'title: Home'],
         '1_article' => ['articles-item', "title: Article\n----\nintro: Fallback introduction\n----\nhero: hero.png\n----\nmainImage: main.png"],
         '2_noindex' => ['default', "title: Private\n----\nseoNoindex: true"],
@@ -33,11 +33,11 @@ function fixture(array $options = [], bool $multilang = true): Kirby\Cms\App
         'privacy' => ['default', 'title: Privacy'],
         'error' => ['error', 'title: Error'],
         '_drafts/draft' => ['default', 'title: Draft'],
-    ];
+    ], $extraPages);
     $suffix = $multilang ? '.it' : '';
     file_put_contents($root . '/content/site' . $suffix . '.txt', 'title: Brand');
     foreach ($pages as $folder => [$template, $content]) {
-        mkdir($root . '/content/' . $folder, 0777, true);
+        if (!is_dir($root . '/content/' . $folder)) mkdir($root . '/content/' . $folder, 0777, true);
         file_put_contents($root . '/content/' . $folder . '/' . $template . $suffix . '.txt', $content);
         if ($multilang && $folder !== '3_italian-only') {
             $translation = $folder === '4_split' ? "title: Split EN\n----\nseoNoindex: false" : $content;
